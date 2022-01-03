@@ -1,16 +1,21 @@
 import math
 import random
+import time
+
 from searchAlgorithms.Moves import randomPick_move_0_1
 from searchAlgorithms.LocalSearch import localSearch
 from utils.Classes import SolutionInstance
 import copy
 
+
 def verySlowDecrease(beta=0.001):
     def fun(T):
-        return T/(1+beta*T)
+        return T / (1 + beta * T)
+
     return fun
 
-def generateRandomNeighbour(solution:SolutionInstance):
+
+def generateRandomNeighbour(solution: SolutionInstance):
     newSol = copy.deepcopy(solution)
 
     while True:
@@ -23,7 +28,7 @@ def generateRandomNeighbour(solution:SolutionInstance):
 
             if moveMade:
                 objAfter = len(truck1.customers) ** 2 + len(truck2.customers) ** 2
-                newSol.customerDenistyObjValue += (objAfter-objBefore)
+                newSol.customerDenistyObjValue += (objAfter - objBefore)
 
                 # mozda smo maknuli jednu rutu
                 if len(truck2.customers) == 0:
@@ -32,7 +37,8 @@ def generateRandomNeighbour(solution:SolutionInstance):
 
                 return newSol
 
-def simAnn(initalSolution: SolutionInstance, T0, Tf, coolingSchedule, numberOfWorseMovesBeforeLocalSearch=20):
+
+def simAnn(initalSolution: SolutionInstance, T0=100, Tf=1, coolingSchedule=verySlowDecrease(beta=0.001), minutes=0, numberOfWorseMovesBeforeLocalSearch=20):
     initalSolution.setCustomerDensityObjValue()
 
     currentSolution = copy.deepcopy(initalSolution)
@@ -40,7 +46,11 @@ def simAnn(initalSolution: SolutionInstance, T0, Tf, coolingSchedule, numberOfWo
     numOfItWithoutImprovement = 0
 
     T = T0
-    while T > Tf:
+    timeEnd = time.time() + 60 * minutes
+    iterations = 0
+
+    while T > Tf if minutes == 0 else time.time() < timeEnd:
+        iterations += 1
         newSolution = generateRandomNeighbour(currentSolution)
 
         deltaF = currentSolution.customerDenistyObjValue - newSolution.customerDenistyObjValue
@@ -67,4 +77,5 @@ def simAnn(initalSolution: SolutionInstance, T0, Tf, coolingSchedule, numberOfWo
         T = coolingSchedule(T)
 
     bestSolution.evaluateRouteForAllLazyEvaluateTrucks()
+    bestSolution.iterations = iterations
     return bestSolution
