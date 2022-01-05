@@ -166,7 +166,7 @@ class SolutionInstance:
 
 
     def writeSolutionToFile(self, time, instance):
-        filename = "results/res-" + getTimeStr(time) + "-i" + str(instance) + ".txt"
+        filename = "../results/res-" + getTimeStr(time) + "-i" + str(instance) + ".txt"
         f = open(filename, "w")
 
         f.write(self.usedTrucks.__str__())
@@ -205,8 +205,8 @@ class SolutionInstance:
 
     # instance, time, no of trucks, total distance, iterations
     def printSummary(self, time, instance):
-        print(instance, ",", getTimeStr(time), ",", self.usedTrucks, ",", self.totalRouteDistance, ",", self.iterations)
+        print(instance, ",", getTimeStr(time), ",", self.usedTrucks, ",", self.totalRouteDistance, ",", self.iterations, sep='')
 
 
 def getTimeStr(time):
-    return "un" if str(time) == 0 else str(time) + "m"
+    return "un" if time == 0 else str(time) + "m"

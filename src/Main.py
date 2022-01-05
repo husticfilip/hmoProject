@@ -50,7 +50,7 @@ def writeSolutionsExecution(inst, i, minutes):
 if __name__ == '__main__':
 
     for i in range(1, 7, 1):
-        inst = readInstance("resources/instance" + str(i))
+        inst = readInstance("../resources/instance" + str(i))
         for j in [1, 5, 0]:
             writeSolutionsExecution(inst, i, j)
 

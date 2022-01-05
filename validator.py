@@ -153,7 +153,8 @@ def validator(**parameters):
 
             num_routes, routes, distance = parse_output(hmo_out)
 
-            if np.array(validate_output(vehicle_number, vehicle_capacity, depot, customers, num_routes, routes, distance)):
+            if np.array(
+                    validate_output(vehicle_number, vehicle_capacity, depot, customers, num_routes, routes, distance)):
                 logging.info(f"Validation SUCCESSFUL")
             else:
                 logging.info(f"Validation FAILED")
