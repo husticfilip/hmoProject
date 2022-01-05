@@ -71,7 +71,7 @@ class Truck:
         time = 0
         for i in range(index):
             nextCust = self.customers[i]
-            dist = ProblemInstance.distances[currCust.id][nextCust.id]
+            dist = math.ceil(ProblemInstance.distances[currCust.id][nextCust.id])
 
             if time + dist < nextCust.readyTime:
                 time = nextCust.readyTime
@@ -82,7 +82,7 @@ class Truck:
             currCust = nextCust
 
         # add customer at index
-        dist = ProblemInstance.distances[currCust.id][newCustomer.id]
+        dist = math.ceil(ProblemInstance.distances[currCust.id][newCustomer.id])
         if time + dist > newCustomer.dueTime:
             return math.inf, None
 
@@ -97,7 +97,7 @@ class Truck:
         # Path after adding new customer
         for i in range(index, len(self.customers)):
             nextCust = self.customers[i]
-            dist = ProblemInstance.distances[currCust.id][nextCust.id]
+            dist = math.ceil(ProblemInstance.distances[currCust.id][nextCust.id])
 
             if time + dist > nextCust.dueTime:
                 return math.inf, None
@@ -111,7 +111,7 @@ class Truck:
             currCust = nextCust
 
         # Check if there is time to get back to depot
-        time += ProblemInstance.distances[currCust.id][ProblemInstance.depot.id]
+        time += math.ceil(ProblemInstance.distances[currCust.id][ProblemInstance.depot.id])
         if time <= ProblemInstance.depot.dueTime:
             return time, capacity
         else:
@@ -124,9 +124,8 @@ class SolutionInstance:
         self.usedTrucks = 0
         self.trucksCapacity = truckCapacity
         self.trucks: List[Truck] = []
-        self.totalRouteDistance = 0
         self.problem = problem
-
+        self.totalRouteDistance = 0
         self.customerDenistyObjValue = 0
 
         self.iterations = 0
@@ -164,22 +163,44 @@ class SolutionInstance:
         print("Customers on the routes=", totalCustomers)
         print("--------------------------------------------------")
 
+
+
     def writeSolutionToFile(self, time, instance):
         filename = "results/res-" + getTimeStr(time) + "-i" + str(instance) + ".txt"
         f = open(filename, "w")
 
-        f.write(self.usedTrucks.__str__() + "\n")
+        f.write(self.usedTrucks.__str__())
 
-        aaa = "TODO"    # TODO na mjesto aa ubaci kad vrijeme posluzivanja kupca
-
-        f.write("0(0)\n")
+        time = 0
+        totalDistancePassed = 0.0
+        currentCustomer = ProblemInstance.depot
         for i, truck in enumerate(self.trucks):
-            f.write(str(i) + ": ")
-            for customer in truck.customers:
-                f.write(str(customer.id) + "(" + aaa + ")->")
-        f.write("0(" + aaa + ")\n")
+            f.write("\n"+str(i+1) + ": 0(0)->")
 
-        f.write(self.totalRouteDistance.__str__())
+            for nextCustomer in truck.customers:
+                dist = math.ceil(ProblemInstance.distances[currentCustomer.id][nextCustomer.id])
+                if time + dist < nextCustomer.readyTime:
+                    time = nextCustomer.readyTime
+                else:
+                    time += dist
+                f.write(str(nextCustomer.id) + "(" + str(time) + ")->")
+
+                totalDistancePassed += ProblemInstance.distances[currentCustomer.id][nextCustomer.id]
+                time += nextCustomer.serviceTime
+                currentCustomer = nextCustomer
+
+            # get beack to the depot
+            time += math.ceil(ProblemInstance.distances[currentCustomer.id][ProblemInstance.depot.id])
+            totalDistancePassed += ProblemInstance.distances[currentCustomer.id][ProblemInstance.depot.id]
+
+            f.write("0(" + str(time) + ")")
+
+            # start new route
+            time = 0
+            currentCustomer = ProblemInstance.depot
+
+        self.totalRouteDistance = totalDistancePassed
+        f.write("\n"+str(totalDistancePassed))
         f.close()
 
     # instance, time, no of trucks, total distance, iterations
@@ -188,4 +209,4 @@ class SolutionInstance:
 
 
 def getTimeStr(time):
-    return "un" if time == 0 else time + "m"
+    return "un" if str(time) == 0 else str(time) + "m"

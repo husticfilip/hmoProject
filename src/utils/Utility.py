@@ -49,7 +49,7 @@ def evaluateRoute(customers:List[Customer]):
     time = 0
     capacity = ProblemInstance.vehicleCapacity
     for nextCust in customers:
-        dist = ProblemInstance.distances[currCust.id][nextCust.id]
+        dist = math.ceil(ProblemInstance.distances[currCust.id][nextCust.id])
         if time + dist > nextCust.dueTime:
             return math.inf, None
 
@@ -66,7 +66,7 @@ def evaluateRoute(customers:List[Customer]):
             return math.inf, None
 
     # Check if there is time to get back to depot
-    time += ProblemInstance.distances[currCust.id][ProblemInstance.depot.id]
+    time += math.ceil(ProblemInstance.distances[currCust.id][ProblemInstance.depot.id])
     if time <= ProblemInstance.depot.dueTime:
         return time, capacity
     else:
