@@ -163,10 +163,8 @@ class SolutionInstance:
         print("Customers on the routes=", totalCustomers)
         print("--------------------------------------------------")
 
-
-
     def writeSolutionToFile(self, time, instance):
-        filename = "../results/res-" + getTimeStr(time) + "-i" + str(instance) + ".txt"
+        filename = "../results/best/res-" + getTimeStr(time) + "-i" + str(instance) + ".txt"
         f = open(filename, "w")
 
         f.write(self.usedTrucks.__str__())
@@ -175,7 +173,7 @@ class SolutionInstance:
         totalDistancePassed = 0.0
         currentCustomer = ProblemInstance.depot
         for i, truck in enumerate(self.trucks):
-            f.write("\n"+str(i+1) + ": 0(0)->")
+            f.write("\n" + str(i + 1) + ": 0(0)->")
 
             for nextCustomer in truck.customers:
                 dist = math.ceil(ProblemInstance.distances[currentCustomer.id][nextCustomer.id])
@@ -200,12 +198,13 @@ class SolutionInstance:
             currentCustomer = ProblemInstance.depot
 
         self.totalRouteDistance = totalDistancePassed
-        f.write("\n"+str(totalDistancePassed))
+        f.write("\n" + str(totalDistancePassed))
         f.close()
 
     # instance, time, no of trucks, total distance, iterations
     def printSummary(self, time, instance):
-        print(instance, ",", getTimeStr(time), ",", self.usedTrucks, ",", self.totalRouteDistance, ",", self.iterations, sep='')
+        print(instance, ",", getTimeStr(time), ",", self.usedTrucks, ",", self.totalRouteDistance, ",", self.iterations,
+              sep='')
 
 
 def getTimeStr(time):

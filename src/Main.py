@@ -47,7 +47,34 @@ def writeSolutionsExecution(inst, i, minutes):
     simAnnSol.printSummary(minutes, i)
 
 
+def findBestParameters(i):
+    inst = readInstance("../resources/instance" + str(i))
+
+    greedySol = greedy(problem=inst)
+    localSearchSol = localSearch(initSol=greedySol)
+
+    N = 500  # otprilike broj iteracija koji zelimo za sim ann
+    bestSolution = simAnn(localSearchSol, 100, 1, verySlowDecrease(0.1))
+    bestParams = [100, 1, 0.1]
+    for t0 in range(100, 1000, 100):
+        for tf in [1, 5]:
+            beta = findBetaFor(t0, tf, N)
+            simAnnSol = simAnn(localSearchSol, t0, tf, verySlowDecrease(beta))
+            if simAnnSol.usedTrucks < bestSolution.usedTrucks or (
+                    simAnnSol.usedTrucks == bestSolution.usedTrucks and simAnnSol.totalRouteDistance < bestSolution.totalRouteDistance):
+                bestSolution = simAnnSol
+                bestParams = [t0, tf, beta]
+
+    simAnnSol.writeSolutionToFile(0, i)
+    simAnnSol.printSummary(0, i)
+    print(bestParams)
+    print("\n\n\n")
+
+
 if __name__ == '__main__':
+
+    # for i in range(1, 7, 1):
+    #     findBestParameters(i)
 
     for i in range(1, 7, 1):
         inst = readInstance("../resources/instance" + str(i))
